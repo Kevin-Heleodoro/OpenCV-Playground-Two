@@ -2,13 +2,20 @@
 
 ## Tasks
 
--   [] Baseline Matching
--   [] Histogram Matching
--   [] Multi-histogram Matching
--   [] Texture and Color
--   [] Deep Network Embeddings
--   [] Compare DNN Embeddings and Classic Features
--   [] Custom Design
+Inputs:
+T = target image
+B = image database
+F = method for computing features
+D(Ft, Fi) = distance metric for two images
+N = desired number of output images
+
+-   [ ] Baseline Matching
+-   [ ] Histogram Matching
+-   [ ] Multi-histogram Matching
+-   [ ] Texture and Color
+-   [ ] Deep Network Embeddings
+-   [ ] Compare DNN Embeddings and Classic Features
+-   [ ] Custom Design
 
 ## Run these programs
 
@@ -27,3 +34,5 @@
    `make <insert name from makefile>` i.e. `make photo` for the photo viewer.
 
 2. Then navigate to the `/bin` directory and run the name of the executable i.e. `./photo.exe`
+
+### Baseline Matching

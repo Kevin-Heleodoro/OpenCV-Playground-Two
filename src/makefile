@@ -7,5 +7,8 @@ LDLIBS = $(shell pkg-config --libs opencv4)
 
 BINDIR = ../bin
 
+baseline_match: baseline_match.o
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$@ $^ $(LDLIBS)
+
 clean:
 	rm -f *.o *~
