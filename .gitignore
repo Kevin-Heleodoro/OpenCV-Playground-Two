@@ -1,0 +1,14 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+
+# Executables
+*.exe
+*.out
+
+# Scratch directory
+scratch/
