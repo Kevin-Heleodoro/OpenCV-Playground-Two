@@ -5,10 +5,20 @@
 # Compiled dynamic libraries
 *.so
 *.dylib
+*.dll
 
 # Executables
 *.exe
 *.out
 
-# Scratch directory
+# IDE specific files
+.vscode/
+.idea/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+.DS_STORE
+
+
+# Misc
 scratch/

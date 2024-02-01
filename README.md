@@ -17,15 +17,6 @@ N = desired number of output images
 -   [ ] Compare DNN Embeddings and Classic Features
 -   [ ] Custom Design
 
-## Run these programs
-
-1. Navigate to the directory containing the `.exe` files and run them as such:
-
--   `./photo.exe starry_night.jpg`
-    > Relative path to any image file.
--   `./vid.exe`
-    > Ensure the `haarcascade_frontalface_alt2.xml` file is in the same directory.
-
 ## How to compile
 
 > Make sure you have opencv installed on your system.
@@ -34,5 +25,14 @@ N = desired number of output images
    `make <insert name from makefile>` i.e. `make photo` for the photo viewer.
 
 2. Then navigate to the `/bin` directory and run the name of the executable i.e. `./photo.exe`
+
+## Run these programs
+
+1. Navigate to the directory containing the `.exe` files and run them as such:
+
+-   `./photo.exe starry_night.jpg`
+    > Relative path to any image file.
+-   `./vid.exe`
+    > Ensure the `haarcascade_frontalface_alt2.xml` file is in the same directory.
 
 ### Baseline Matching
