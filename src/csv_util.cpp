@@ -123,7 +123,7 @@ int getfloat(FILE *fp, float *v)
 
   The function returns a non-zero value in case of an error.
  */
-int append_image_data_csv(char *filename, char *image_filename, std::vector<float> &image_data, int reset_file)
+int append_image_data_csv(const char *filename, char *image_filename, std::vector<float> &image_data, int reset_file)
 {
     char buffer[256];
     char mode[8];
@@ -149,7 +149,7 @@ int append_image_data_csv(char *filename, char *image_filename, std::vector<floa
     for (int i = 0; i < image_data.size(); i++)
     {
         char tmp[256];
-        sprintf(tmp, ",%.4f", image_data[i]);
+        snprintf(tmp, sizeof(tmp), ",%.4f", image_data[i]);
         std::fwrite(tmp, sizeof(char), strlen(tmp), fp);
     }
 
@@ -234,4 +234,23 @@ int read_image_data_csv(char *filename, std::vector<char *> &filenames, std::vec
     }
 
     return (0);
+}
+
+/**
+ * @brief Get the current date and time as a formatted string.
+ *
+ * This function retrieves the current date and time from the system clock and formats it as a string
+ * in the format "YYYY-MM-DD_HH-MM-SS". The formatted string is returned.
+ *
+ * @return std::string The current date and time as a formatted string.
+ */
+std::string getCurrentDateTimeStamp()
+{
+    auto now = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&currentTime), "%Y-%m-%d_%H-%M-%S");
+
+    return ss.str();
 }

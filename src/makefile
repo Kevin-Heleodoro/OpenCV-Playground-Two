@@ -10,5 +10,8 @@ BINDIR = ../bin
 baseline_match: baseline_match.o feature_utils.o
 	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
 
+feature_extract: feature_extract.o feature_utils.o csv_util.o
+	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
+
 clean:
 	rm -f *.o *~
