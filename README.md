@@ -36,3 +36,20 @@ N = desired number of output images
     > Ensure the `haarcascade_frontalface_alt2.xml` file is in the same directory.
 
 ### Baseline Matching
+
+v1.0
+
+This version iterates through the sample_images directory every time it is called to match the
+target image vectors to the top N matches within the directory. This is not sustainable long-term
+if we will be comparing many images.
+
+![feature extracting and matching](./data/screenshots/baseline_match_v1.0.png)
+
+v2.0
+
+This version consists of two parts. The first extracts all of the features into a .csv file and the second references the feature vectors within the csv file instead of having to create them
+every iteration
+
+![feature extraction](./data/screenshots/feature_extraction.png)
+
+![matching]()

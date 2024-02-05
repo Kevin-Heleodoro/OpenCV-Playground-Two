@@ -44,4 +44,6 @@ int read_image_data_csv(char *filename, std::vector<char *> &filenames, std::vec
 
 std::string getCurrentDateTimeStamp();
 
+std::vector<std::pair<std::string, std::vector<float>>> readFeatureVectorsFromCSV(const std::string &filename);
+
 #endif

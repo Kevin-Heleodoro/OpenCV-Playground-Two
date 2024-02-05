@@ -10,6 +10,18 @@
 #define FEATURE_UTILS_H
 
 /**
+ * @brief A struct to hold the filename and distance of a matching image
+ *
+ * @param filename The filename of the matching image
+ * @param distance The distance of the matching image
+ */
+struct ImageMatch
+{
+    std::string filename;
+    float distance;
+};
+
+/**
  * @brief Extract a feature vector from an image
  *
  * @param imagePath The path to the image
@@ -25,5 +37,11 @@ std::vector<float> extractFeatureVector(const std::string &imagePath);
  * @return float The Euclidean distance between the two feature vectors
  */
 float computeDistance(const std::vector<float> &vector1, const std::vector<float> &vector2);
+
+std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const std::string &imageDir, int topN);
+
+std::vector<ImageMatch> findTopNMatches(const std::vector<float> &targetVector,
+                                        const std::vector<std::pair<std::string, std::vector<float>>> &featureVectors,
+                                        int topN);
 
 #endif

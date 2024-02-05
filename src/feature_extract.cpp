@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
 
     printf("Creating feature_vectors directory...\n\n\n");
     std::string feature_vectors_dir = "feature_vectors";
-    // std::__fs::filesystem::create_directory(feature_vectors_dir);
     // Create a .csv file
     std::string feature_vectors_csv = feature_vectors_dir + "/feature_vectors.csv";
     FILE *fp = fopen(feature_vectors_csv.c_str(), "w");

@@ -1,4 +1,13 @@
 /*
+EDITED BY:
+Kevin Heleodoro
+February 2,2024
+
+Edits include the addition of the getCurrentDateTimeStamp and the readFeatureVector functions
+
+====================================================================================================
+
+ORIGINALLY WRITTEN BY:
 Bruce A. Maxwell
 
 CS 5330 Computer Vision
@@ -14,6 +23,8 @@ The function returns a std::vector of char* for the filenames and a 2D std::vect
 #include "opencv2/opencv.hpp"
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <sstream>
 #include <vector>
 
 /*
@@ -198,7 +209,7 @@ int read_image_data_csv(char *filename, std::vector<char *> &filenames, std::vec
         {
             break;
         }
-        // printf("Evaluting %s\n", filename);
+        printf("Evaluting %s\n", filename);
 
         // read the whole feature file into memory
         for (;;)
@@ -234,6 +245,31 @@ int read_image_data_csv(char *filename, std::vector<char *> &filenames, std::vec
     }
 
     return (0);
+}
+
+std::vector<std::pair<std::string, std::vector<float>>> readFeatureVectorsFromCSV(const std::string &filename)
+{
+    std::vector<std::pair<std::string, std::vector<float>>> featureVectors;
+    std::ifstream file(filename);
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string item;
+        std::vector<float> vector;
+        std::string filename;
+        std::getline(ss, filename, ',');
+
+        while (std::getline(ss, item, ','))
+        {
+            vector.push_back(std::stof(item));
+        }
+
+        featureVectors.emplace_back(filename, vector);
+    }
+
+    return featureVectors;
 }
 
 /**
