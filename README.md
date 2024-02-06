@@ -53,3 +53,7 @@ every iteration
 ![feature extraction](./data/screenshots/feature_extraction.png)
 
 ![matching](./data/screenshots/baseline_match_v2.0.png)
+
+### Histogram Matching
+
+Use a single normalized color histogram as the feature vector. Use histogram intersection as the distance metric.

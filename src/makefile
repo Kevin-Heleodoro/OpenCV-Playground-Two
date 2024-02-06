@@ -16,5 +16,8 @@ baseline_match_1: baseline_match_1.o feature_utils.o
 feature_extract: feature_extract.o feature_utils.o csv_util.o
 	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
 
+k_means: kmeans.o 
+	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
+
 clean:
 	rm -f *.o *~

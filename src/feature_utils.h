@@ -38,8 +38,26 @@ std::vector<float> extractFeatureVector(const std::string &imagePath);
  */
 float computeDistance(const std::vector<float> &vector1, const std::vector<float> &vector2);
 
+/**
+ * @brief Find the top N matches for a target image in a directory of images
+ *
+ * @param targetImage The target image to match
+ * @param imageDir The directory of images to search
+ * @param topN The number of top matches to return
+ * @return std::vector<ImageMatch> A vector of ImageMatch structs containing the filename and distance of the top N
+ * matches
+ */
 std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const std::string &imageDir, int topN);
 
+/**
+ * @brief Find the top N matches for a target feature vector in a set of feature vectors
+ *
+ * @param targetVector The target feature vector
+ * @param featureVectors The set of feature vectors to search
+ * @param topN The number of top matches to return
+ * @return std::vector<ImageMatch> A vector of ImageMatch structs containing the filename and distance of the top N
+ * matches
+ */
 std::vector<ImageMatch> findTopNMatches(const std::vector<float> &targetVector,
                                         const std::vector<std::pair<std::string, std::vector<float>>> &featureVectors,
                                         int topN);

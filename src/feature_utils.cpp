@@ -57,18 +57,6 @@ float computeDistance(const std::vector<float> &vector1, const std::vector<float
     return distance;
 }
 
-// /**
-//  * @brief A struct to hold the filename and distance of a matching image
-//  *
-//  * @param filename The filename of the matching image
-//  * @param distance The distance of the matching image
-//  */
-// struct ImageMatch
-// {
-//     std::string filename;
-//     float distance;
-// };
-
 /**
  * @brief Find the top N matches for a target image in a directory of images
  *
@@ -120,6 +108,15 @@ std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const st
     return matches;
 }
 
+/**
+ * @brief Find the top N matches for a target feature vector in a set of feature vectors
+ *
+ * @param targetVector The target feature vector
+ * @param featureVectors The set of feature vectors to search
+ * @param topN The number of top matches to return
+ * @return std::vector<ImageMatch> A vector of ImageMatch structs containing the filename and distance of the top N
+ * matches
+ */
 std::vector<ImageMatch> findTopNMatches(const std::vector<float> &targetVector,
                                         const std::vector<std::pair<std::string, std::vector<float>>> &featureVectors,
                                         int topN = 3)
