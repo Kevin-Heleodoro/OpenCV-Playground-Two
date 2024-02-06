@@ -126,9 +126,12 @@ std::vector<ImageMatch> findTopNMatches(const std::vector<float> &targetVector,
 {
     std::vector<ImageMatch> matches;
 
-    printf("Finding top %d matches for target vector ...\n", topN);
-    for (const auto &[filename, vector] : featureVectors)
+    // printf("Finding top %d matches for target vector ...\n", topN);
+    // for (const auto &[filename, vector] : featureVectors)
+    for (const auto &pair : featureVectors)
     {
+        const std::string &filename = pair.first;
+        const std::vector<float> &vector = pair.second;
         printf("Processing image: %s\n", filename.c_str());
         float distance = computeDistance(targetVector, vector);
         if (distance < 0.0)

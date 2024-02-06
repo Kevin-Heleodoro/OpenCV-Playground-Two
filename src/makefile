@@ -7,7 +7,7 @@ LDLIBS = $(shell pkg-config --libs opencv4)
 
 BINDIR = ../bin
 
-baseline_match: baseline_match.o feature_utils.o
+baseline_match: baseline_match.o feature_utils.o csv_util.o
 	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
 
 baseline_match_1: baseline_match_1.o feature_utils.o
