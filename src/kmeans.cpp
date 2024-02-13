@@ -202,6 +202,7 @@ int main(int argc, char *argv[])
     cv::imshow("Original", original);
     cv::imshow("K-means", image);
     cv::waitKey(0);
+    cv::imwrite(filename + std::to_string(K) + "_kmeans.jpg", image);
 
     delete[] labels;
 

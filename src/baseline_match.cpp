@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
     char vectorCsv[256];
     int topN = 3;
     DIR *dirp;
-    // FILE *fp;
 
     strcpy(targetImagePath, argv[1]);
     printf("Target image set to %s\n", targetImagePath);

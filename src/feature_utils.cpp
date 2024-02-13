@@ -123,8 +123,6 @@ std::vector<ImageMatch> findTopNMatches(const std::vector<float> &targetVector,
 {
     std::vector<ImageMatch> matches;
 
-    // printf("Finding top %d matches for target vector ...\n", topN);
-    // for (const auto &[filename, vector] : featureVectors)
     for (const auto &pair : featureVectors)
     {
         const std::string &filename = pair.first;
