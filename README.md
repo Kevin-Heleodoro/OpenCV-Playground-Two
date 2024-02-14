@@ -57,3 +57,25 @@ every iteration
 ### Histogram Matching
 
 Use a single normalized color histogram as the feature vector. Use histogram intersection as the distance metric.
+
+**The RGB histogram is probably printing out 0.000 for all distances**
+
+```shell
+Top 3 matches for ./sample_images/pic.0219.jpg:
+pic.0066.jpg9_kmeans.jpg: 0.000000
+pic.0236.jpg: 0.000000
+pic.0168.jpg: 0.000000
+pic.0183.jpg: 0.000000
+pic.0186.jpg: 0.000000
+pic.0135.jpg: 0.000000
+pic.0121.jpg: 0.000000
+pic.0281.jpg: 0.000000
+pic.0097.jpg: 0.000000
+pic.0066.jpg6_kmeans.jpg: 0.000000
+pic.0078.jpg: 0.000000
+pic.0066.jpg3_kmeans.jpg: 0.000000
+pic.0276.jpg: 0.000000
+pic.0066.jpg: 0.000000
+pic.0175.jpg: 0.000000
+Terminating
+```

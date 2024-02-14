@@ -19,7 +19,7 @@ feature_extract: feature_extract.o feature_utils.o csv_util.o
 k_means: kmeans.o 
 	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
 
-histogram_match: histogram_match.o 
+histogram_match: histogram_match.o histogram_utils.o
 	$(CXX) $^ -o $(BINDIR)/$@.exe $(LDLIBS)
 
 clean:
