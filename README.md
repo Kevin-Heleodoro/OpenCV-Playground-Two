@@ -79,3 +79,16 @@ pic.0066.jpg: 0.000000
 pic.0175.jpg: 0.000000
 Terminating
 ```
+
+> The solution for this was in the way I was initializing the rgb histogram.
+
+```c++
+if (histogramType == 0 || histogramType == 2)
+{
+    // convert image to RGB
+    printf("Creating RG chromaticity histogram with %d bins ...\n", histSize);
+    cv::cvtColor(image, rgbImage, cv::COLOR_BGR2RGB); // I was assigning the color values to the wrong cv::Mat so rgbImage was being passed in without any actual information.
+    targetRgbHist = calcRgbHist(rgbImage, histSize);
+    printf("Target RGB histogram size: %d x %d\n", targetRgbHist.rows, targetRgbHist.cols);
+}
+```

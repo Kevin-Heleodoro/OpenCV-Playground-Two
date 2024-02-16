@@ -15,6 +15,7 @@
 
 #include "csv_util.h"
 #include "feature_utils.h"
+#include "filter.h"
 #include "histogram_utils.h"
 
 /**
@@ -31,25 +32,30 @@ int main(int argc, char *argv[])
 {
     if (argc < 1)
     {
-        printf("Usage: %s <targetImage> [histogramType] [vectorCsvFile] \n", argv[0]);
-        printf("Histogram type: 0 for RGB, 1 for HSV, 2 for both\n");
+        printf("Usage: %s <targetImage> [histogramType] \n", argv[0]);
+        printf("Histogram type: \n0 for RG Chromaticity \n1 for HSV \n2 for RG Chromaticity & HSV \n3 for color & "
+               "texture \n4 for Deep Network Embedding \n");
         exit(-1);
     }
 
     printf("\n\n========== Histogram Match ==========\n\n");
 
+    DIR *dirp;
     cv::Mat image;
-    cv::Mat hsvImage;
-    cv::Mat rgbImage;
-    cv::Mat targetHsvHist;
-    cv::Mat targetRgbHist;
+    cv::Mat histImageOne;
+    cv::Mat histImageTwo;
+    cv::Mat targetHistOne;
+    cv::Mat targetHistTwo;
     char targetImagePath[256];
     char vectorCsv[256];
     int histogramType = 1;
     const int hBins = 30;
     const int sBins = 30;
     const int histSize = 30;
-    DIR *dirp;
+    const int fullHistSize = 256;
+
+    std::string resNetCsv = "./feature_vectors/ResNet18_olym.csv";
+    std::vector<std::pair<std::string, std::vector<float>>> resNetVectors;
 
     strcpy(targetImagePath, argv[1]);
     printf("Target image set to %s\n", targetImagePath);
@@ -71,67 +77,134 @@ int main(int argc, char *argv[])
         printf("Using histogram type: %d\n", histogramType);
     }
 
+    if (histogramType < 0 || histogramType > 4)
+    {
+        printf("Invalid histogram type: %d\n", histogramType);
+        return -1;
+    }
+
+    if (histogramType == 4)
+    {
+        // Use deep network embedding
+        printf("Using deep network embedding\n");
+        resNetVectors = readFeatureVectorsFromCSV(resNetCsv);
+        printf("Read %lu feature vectors\n", resNetVectors.size());
+    }
+
+    if (histogramType == 3)
+    {
+        // convert image to RGB histogram
+        printf("\nCreating RGB histogram with %d bins ...\n", fullHistSize);
+        cv::cvtColor(image, histImageOne, cv::COLOR_BGR2RGB);
+        targetHistOne = calcColorHist(histImageOne, fullHistSize);
+        printf("Target RGB histogram size: %d x %d\n", targetHistOne.rows, targetHistOne.cols);
+
+        // convert image to texture histogram
+        printf("\nCreating texture histogram with %d bins ...\n", fullHistSize);
+        magnitude(image, histImageTwo);
+        histImageTwo.convertTo(histImageTwo, CV_32F, 1.0 / 255.0);
+        targetHistTwo = calcTextureHist(histImageTwo, fullHistSize);
+        printf("Target texture histogram size: %d x %d\n", targetHistTwo.rows, targetHistTwo.cols);
+    }
+
     if (histogramType == 1 || histogramType == 2)
     {
-        // convert image to HSV
-        printf("Creating HSV histogram with %d hue bins and %d saturation bins ...\n", hBins, sBins);
-        cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV);
-        targetHsvHist = calcHsvHist(hsvImage, hBins, sBins);
-        printf("Target HSV histogram size: %d x %d\n", targetHsvHist.rows, targetHsvHist.cols);
+        // convert image to HSV histogram
+        printf("\nCreating HSV histogram with %d hue bins and %d saturation bins ...\n", hBins, sBins);
+        cv::cvtColor(image, histImageOne, cv::COLOR_BGR2HSV);
+        targetHistOne = calcHsvHist(histImageOne, hBins, sBins);
+        printf("Target HSV histogram size: %d x %d\n", targetHistOne.rows, targetHistOne.cols);
     }
 
     if (histogramType == 0 || histogramType == 2)
     {
-        // convert image to RGB
-        printf("Creating RG chromaticity histogram with %d bins ...\n", histSize);
-        cv::cvtColor(image, rgbImage, cv::COLOR_BGR2RGB);
-        targetRgbHist = calcRgbHist(rgbImage, histSize);
-        printf("Target RGB histogram size: %d x %d\n", targetRgbHist.rows, targetRgbHist.cols);
+        // convert image to RG Chromaticity histogram
+        printf("\nCreating RG chromaticity histogram with %d bins ...\n", histSize);
+        cv::cvtColor(image, histImageTwo, cv::COLOR_BGR2RGB);
+        targetHistTwo = calcRgbHist(histImageTwo, histSize);
+        printf("Target RG Chromaticity histogram size: %d x %d\n", targetHistTwo.rows, targetHistTwo.cols);
     }
 
-    std::vector<std::pair<std::string, float>> hsvImageMatches;
-    std::vector<std::pair<std::string, float>> rgbImageMatches;
+    std::vector<std::pair<std::string, float>> histImageOneMatches;
+    std::vector<std::pair<std::string, float>> histImageTwoMatches;
     char buffer[256];
     char dirPath[256] = "./sample_images";
     struct dirent *dp;
 
+    printf("\n");
+
+    if (histogramType == 4)
+    {
+        printf("====================================\n");
+        printf("Calculating deep network embedding matches ...\n");
+        histImageOneMatches = compareDeepNetworkEmbedding(resNetVectors, targetImagePath, buffer);
+    }
+    if (histogramType == 3)
+    {
+        printf("====================================\n");
+        printf("Calculating color histograms ...\n");
+        histImageOneMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistOne, buffer, 3);
+        printf("====================================\n");
+        printf("Calculating texture histograms ...\n");
+        histImageTwoMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistTwo, buffer, 3);
+    }
     if (histogramType == 2)
     {
-        printf("\nCalculating both HSV and RGB histograms...\n");
-        hsvImageMatches = compareHistograms(dp, dirPath, targetImagePath, targetHsvHist, buffer, 1);
-        rgbImageMatches = compareHistograms(dp, dirPath, targetImagePath, targetRgbHist, buffer, 0);
+        printf("====================================\n");
+        printf("Calculating both HSV ...\n");
+        histImageOneMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistOne, buffer, 1);
+        printf("====================================\n");
+        printf("Calculating RG Chromaticity ...\n");
+        histImageTwoMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistTwo, buffer, 0);
     }
-    else if (histogramType == 1)
+    if (histogramType == 1)
     {
-        printf("\nCalculating HSV histograms...\n");
-        hsvImageMatches = compareHistograms(dp, dirPath, targetImagePath, targetHsvHist, buffer, 1);
+        printf("====================================\n");
+        printf("Calculating HSV histograms...\n");
+        histImageOneMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistOne, buffer, 1);
     }
-    else if (histogramType == 0)
+    if (histogramType == 0)
     {
-        printf("\nCalculating RGB histograms...\n");
-        rgbImageMatches = compareHistograms(dp, dirPath, targetImagePath, targetRgbHist, buffer, 0);
+        printf("====================================\n");
+        printf("Calculating RGB histograms...\n");
+        histImageTwoMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistTwo, buffer, 0);
     }
 
     std::vector<std::pair<std::string, float>> imageMatches;
 
-    if (histogramType == 2)
+    if (histogramType == 4)
     {
-        printf("Combining matches...\n");
-        for (int i = 0; i < hsvImageMatches.size(); i++)
+        imageMatches = histImageOneMatches;
+    }
+    if (histogramType == 3)
+    {
+        printf("Combining Color & Texture matches...\n");
+        for (int i = 0; i < histImageOneMatches.size(); i++)
         {
-            std::string filename = hsvImageMatches[i].first;
-            float distance = hsvImageMatches[i].second;
-            distance += rgbImageMatches[i].second;
+            std::string filename = histImageOneMatches[i].first;
+            float distance = histImageOneMatches[i].second;
+            distance += histImageTwoMatches[i].second;
             imageMatches.push_back(std::make_pair(filename, distance));
         }
     }
-    else if (histogramType == 1)
+    if (histogramType == 2)
     {
-        imageMatches = hsvImageMatches;
+        printf("Combining RG Chromaticity & HSV matches...\n");
+        for (int i = 0; i < histImageOneMatches.size(); i++)
+        {
+            std::string filename = histImageOneMatches[i].first;
+            float distance = histImageOneMatches[i].second;
+            distance += histImageTwoMatches[i].second;
+            imageMatches.push_back(std::make_pair(filename, distance));
+        }
     }
-    else if (histogramType == 0)
+    if (histogramType == 1)
     {
-        imageMatches = rgbImageMatches;
+        imageMatches = histImageOneMatches;
+    }
+    if (histogramType == 0)
+    {
+        imageMatches = histImageTwoMatches;
     }
 
     printf("Sorting matches...\n");
@@ -142,9 +215,13 @@ int main(int argc, char *argv[])
 
     printf("\n=====================================\n\n");
     printf("Top 3 matches for %s:\n", targetImagePath);
-    for (int i = 0; i < imageMatches.size(); i++)
+    cv::Mat original, one, two, three;
+    std::vector<cv::Mat> mats = {one, two, three};
+
+    for (int i = 0; i < 3; i++)
     {
         printf("%s: %f\n", imageMatches[i].first.c_str(), imageMatches[i].second);
+        createDisplayHist(targetHistOne, histImageOne, hBins);
     }
 
     printf("Terminating\n\n");
