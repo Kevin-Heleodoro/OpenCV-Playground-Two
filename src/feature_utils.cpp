@@ -3,6 +3,7 @@
 // Purpose: Contains utility functions for extracting feature vectors from images and computing distances between
 // feature vectors.
 
+#include <cstring>
 #include <filesystem>
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -77,21 +78,27 @@ std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const st
     printf("Extracting feature vectors for directory images ...\n");
     for (const auto &entry : std::__fs::filesystem::directory_iterator(imageDir))
     {
-        printf("Processing image: %s\n", entry.path().string().c_str());
-        std::vector<float> featureVector = extractFeatureVector(entry.path().string());
-        float distance = computeDistance(targetVector, featureVector);
-        if (distance < 0.0)
+        std::string filename = entry.path().string().c_str();
+
+        if (strstr(filename.c_str(), ".jpg") || strstr(filename.c_str(), ".png") || strstr(filename.c_str(), ".ppm") ||
+            strstr(filename.c_str(), ".tif"))
         {
-            printf("Error: distance is negative\n");
-            continue;
-        }
-        else if (distance == 0.0)
-        {
-            continue;
-        }
-        else
-        {
-            matches.push_back({entry.path().string(), distance});
+            printf("Processing image: %s\n", entry.path().string().c_str());
+            std::vector<float> featureVector = extractFeatureVector(entry.path().string());
+            float distance = computeDistance(targetVector, featureVector);
+            if (distance < 0.0)
+            {
+                printf("Error: distance is negative\n");
+                continue;
+            }
+            else if (distance == 0.0)
+            {
+                continue;
+            }
+            else
+            {
+                matches.push_back({entry.path().string(), distance});
+            }
         }
     }
 

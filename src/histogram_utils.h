@@ -17,8 +17,22 @@
  */
 float histIntersect(const cv::Mat &histA, const cv::Mat &histB);
 
+/**
+ * @brief Calculate the color histogram of an image
+ *
+ * @param image The RGB image
+ * @param bins The number of bins
+ * @return cv::Mat The histogram
+ */
 cv::Mat calcColorHist(const cv::Mat &image, int bins);
 
+/**
+ * @brief Calculate the texture histogram of an image
+ *
+ * @param image The image
+ * @param bins The number of bins
+ * @return cv::Mat The histogram
+ */
 cv::Mat calcTextureHist(const cv::Mat &image, int bins);
 
 /**
@@ -64,9 +78,25 @@ std::vector<std::pair<std::string, float>> compareHistograms(struct dirent *dp, 
  */
 cv::Mat createDisplayHist(cv::Mat &hist, cv::Mat &dst, int histsize);
 
+/**
+ * @brief Compare the deep network embeddings of images in a directory
+ *
+ * @param resNetCsv The ResNet CSV file
+ * @param targetImagePath The path of the target image
+ * @param buffer The buffer for the image path
+ * @return std::vector<std::pair<std::string, float>> The list of image matches
+ */
 std::vector<std::pair<std::string, float>> compareDeepNetworkEmbedding(
     std::vector<std::pair<std::string, std::vector<float>>> resNetCsv, std::string targetImagePath, std::string buffer);
 
+/**
+ * @brief Extract the target feature vector from the CSV file
+ *
+ * @param csvFeatures The CSV feature vectors
+ * @param targetImagePath The path of the target image
+ * @return std::pair<std::string, std::vector<float>> The target feature vector
+ *
+ */
 std::pair<std::string, std::vector<float>> extractTargetFeatureVectorFromFile(
     std::vector<std::pair<std::string, std::vector<float>>> csvFeatures, std::string targetImagePath);
 #endif

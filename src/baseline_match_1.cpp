@@ -21,11 +21,11 @@
  * @param filename The filename of the matching image
  * @param distance The distance of the matching image
  */
-struct ImageMatch
-{
-    std::string filename;
-    float distance;
-};
+// struct ImageMatch
+// {
+//     std::string filename;
+//     float distance;
+// };
 
 /**
  * @brief Find the top N matches for a target image in a directory of images
@@ -36,47 +36,47 @@ struct ImageMatch
  * @return std::vector<ImageMatch> A vector of ImageMatch structs containing the filename and distance of the top N
  * matches
  */
-std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const std::string &imageDir, int topN = 3)
-{
-    printf("Extracting feature vector for target image ...\n");
-    std::vector<float> targetVector = extractFeatureVector(targetImage);
-    printf("Target vector size: %lu\n", targetVector.size());
-    printf("Target distance to self: %f\n", computeDistance(targetVector, targetVector));
-    std::vector<ImageMatch> matches;
+// std::vector<ImageMatch> findTopNMatches(const std::string &targetImage, const std::string &imageDir, int topN = 3)
+// {
+//     printf("Extracting feature vector for target image ...\n");
+//     std::vector<float> targetVector = extractFeatureVector(targetImage);
+//     printf("Target vector size: %lu\n", targetVector.size());
+//     printf("Target distance to self: %f\n", computeDistance(targetVector, targetVector));
+//     std::vector<ImageMatch> matches;
 
-    printf("Extracting feature vectors for directory images ...\n");
-    for (const auto &entry : std::__fs::filesystem::directory_iterator(imageDir))
-    {
-        printf("Processing image: %s\n", entry.path().string().c_str());
-        std::vector<float> featureVector = extractFeatureVector(entry.path().string());
-        float distance = computeDistance(targetVector, featureVector);
-        if (distance < 0.0)
-        {
-            printf("Error: distance is negative\n");
-            continue;
-        }
-        else if (distance == 0.0)
-        {
-            continue;
-        }
-        else
-        {
-            matches.push_back({entry.path().string(), distance});
-        }
-    }
+//     printf("Extracting feature vectors for directory images ...\n");
+//     for (const auto &entry : std::__fs::filesystem::directory_iterator(imageDir))
+//     {
+//         printf("Processing image: %s\n", entry.path().string().c_str());
+//         std::vector<float> featureVector = extractFeatureVector(entry.path().string());
+//         float distance = computeDistance(targetVector, featureVector);
+//         if (distance < 0.0)
+//         {
+//             printf("Error: distance is negative\n");
+//             continue;
+//         }
+//         else if (distance == 0.0)
+//         {
+//             continue;
+//         }
+//         else
+//         {
+//             matches.push_back({entry.path().string(), distance});
+//         }
+//     }
 
-    printf("Found %lu matches\n", matches.size());
-    printf("Sorting matches...\n");
-    std::sort(matches.begin(), matches.end(),
-              [](const ImageMatch &a, const ImageMatch &b) { return a.distance < b.distance; });
+//     printf("Found %lu matches\n", matches.size());
+//     printf("Sorting matches...\n");
+//     std::sort(matches.begin(), matches.end(),
+//               [](const ImageMatch &a, const ImageMatch &b) { return a.distance < b.distance; });
 
-    if (matches.size() > topN)
-    {
-        matches.resize(topN);
-    }
+//     if (matches.size() > topN)
+//     {
+//         matches.resize(topN);
+//     }
 
-    return matches;
-}
+//     return matches;
+// }
 
 /**
  * @brief Main function to find the top N matches for a target image in a directory of images

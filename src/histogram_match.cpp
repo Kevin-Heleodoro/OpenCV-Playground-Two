@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     {
         printf("Usage: %s <targetImage> [histogramType] \n", argv[0]);
         printf("Histogram type: \n0 for RG Chromaticity \n1 for HSV \n2 for RG Chromaticity & HSV \n3 for color & "
-               "texture \n4 for Deep Network Embedding \n");
+               "texture \n4 for Deep Network Embedding \n5 for CBIR\n");
         exit(-1);
     }
 
@@ -77,10 +77,30 @@ int main(int argc, char *argv[])
         printf("Using histogram type: %d\n", histogramType);
     }
 
-    if (histogramType < 0 || histogramType > 4)
+    if (histogramType < 0 || histogramType > 5)
     {
         printf("Invalid histogram type: %d\n", histogramType);
         return -1;
+    }
+
+    if (histogramType == 5)
+    {
+        // Extract DNN feature vector for target image
+        printf("Using CBIR\n");
+        printf("Extracting DNN feature vector for target image ...\n");
+        resNetVectors = readFeatureVectorsFromCSV(resNetCsv);
+        printf("=> Read %lu feature vectors\n", resNetVectors.size());
+        // Extract Colors
+        printf("Extracting color features for target image ...\n");
+        cv::cvtColor(image, histImageOne, cv::COLOR_BGR2RGB);
+        targetHistOne = calcColorHist(histImageOne, fullHistSize);
+        printf("=> Target RGB histogram size: %d x %d\n", targetHistOne.rows, targetHistOne.cols);
+        // Extract Texture
+        printf("Extracting texture features for target image ...\n");
+        magnitude(image, histImageTwo);
+        histImageTwo.convertTo(histImageTwo, CV_32F, 1.0 / 255.0);
+        targetHistTwo = calcTextureHist(histImageTwo, fullHistSize);
+        printf("=> Target texture histogram size: %d x %d\n", targetHistTwo.rows, targetHistTwo.cols);
     }
 
     if (histogramType == 4)
@@ -127,12 +147,23 @@ int main(int argc, char *argv[])
 
     std::vector<std::pair<std::string, float>> histImageOneMatches;
     std::vector<std::pair<std::string, float>> histImageTwoMatches;
+    std::vector<std::pair<std::string, float>> dnnMatches;
     char buffer[256];
     char dirPath[256] = "./sample_images";
     struct dirent *dp;
 
     printf("\n");
 
+    if (histogramType == 5)
+    {
+        printf("====================================\n");
+        printf("\nCalculating Deep Network Embedding matches ...\n");
+        dnnMatches = compareDeepNetworkEmbedding(resNetVectors, targetImagePath, buffer);
+        printf("\nCalculating color matches ...\n");
+        histImageOneMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistOne, buffer, 3);
+        printf("\nCalculating texture matches ...\n");
+        histImageTwoMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistTwo, buffer, 3);
+    }
     if (histogramType == 4)
     {
         printf("====================================\n");
@@ -166,12 +197,24 @@ int main(int argc, char *argv[])
     if (histogramType == 0)
     {
         printf("====================================\n");
-        printf("Calculating RGB histograms...\n");
+        printf("Calculating RG Chromaticity histograms...\n");
         histImageTwoMatches = compareHistograms(dp, dirPath, targetImagePath, targetHistTwo, buffer, 0);
     }
 
     std::vector<std::pair<std::string, float>> imageMatches;
 
+    if (histogramType == 5)
+    {
+        printf("Combining Deep Network Embedding, Color & Texture matches...\n");
+        for (int i = 0; i < histImageOneMatches.size(); i++)
+        {
+            std::string filename = histImageOneMatches[i].first;
+            float distance = histImageOneMatches[i].second;
+            distance += histImageTwoMatches[i].second;
+            distance += dnnMatches[i].second;
+            imageMatches.push_back(std::make_pair(filename, distance));
+        }
+    }
     if (histogramType == 4)
     {
         imageMatches = histImageOneMatches;
@@ -218,7 +261,7 @@ int main(int argc, char *argv[])
     cv::Mat original, one, two, three;
     std::vector<cv::Mat> mats = {one, two, three};
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("%s: %f\n", imageMatches[i].first.c_str(), imageMatches[i].second);
         createDisplayHist(targetHistOne, histImageOne, hBins);

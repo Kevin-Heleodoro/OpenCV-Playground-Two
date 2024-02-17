@@ -69,6 +69,13 @@ cv::Mat calcColorHist(const cv::Mat &image, int bins)
     return hist;
 }
 
+/**
+ * @brief Calculate the texture histogram of an image
+ *
+ * @param image The image
+ * @param bins The number of bins
+ * @return cv::Mat The histogram
+ */
 cv::Mat calcTextureHist(const cv::Mat &image, int bins)
 {
     cv::Mat hist = cv::Mat::zeros(bins, bins, CV_32F);
@@ -172,12 +179,18 @@ cv::Mat calcRgbHist(const cv::Mat &image, int histSize)
         }
     }
 
-    printf("The largest bucket has %d pixels in it\n", (int)max);
+    // printf("The largest bucket has %d pixels in it\n", (int)max);
     hist /= (src.rows * src.cols);
 
     return hist;
 }
 
+/**
+ * @brief Calculate the cosine distance between two feature vectors
+ *
+ * @param v1 The first feature vector
+ * @param v2 The second feature vector
+ */
 float cosineDistance(const std::vector<float> &v1, const std::vector<float> &v2)
 {
     float dotProduct = 0.0;
@@ -189,12 +202,17 @@ float cosineDistance(const std::vector<float> &v1, const std::vector<float> &v2)
         mag1 += v1[i] * v1[i];
         mag2 += v2[i] * v2[i];
     }
-    // mag1 = sqrt(mag1);
-    // mag2 = sqrt(mag2);
-    // return dotProduct / (mag1 * mag2);
     return 1 - dotProduct / (sqrt(mag1) * sqrt(mag2));
 }
 
+/**
+ * @brief Extract the target feature vector from the CSV file
+ *
+ * @param csvFeatures The CSV feature vectors
+ * @param targetImagePath The path of the target image
+ * @return std::pair<std::string, std::vector<float>> The target feature vector
+ *
+ */
 std::pair<std::string, std::vector<float>> extractTargetFeatureVectorFromFile(
     std::vector<std::pair<std::string, std::vector<float>>> csvFeatures, std::string targetImagePath)
 {
@@ -214,6 +232,14 @@ std::pair<std::string, std::vector<float>> extractTargetFeatureVectorFromFile(
     return std::make_pair(targetImage, targetVector);
 }
 
+/**
+ * @brief Compare the deep network embeddings of images in a directory
+ *
+ * @param resNetCsv The ResNet CSV file
+ * @param targetImagePath The path of the target image
+ * @param buffer The buffer for the image path
+ * @return std::vector<std::pair<std::string, float>> The list of image matches
+ */
 std::vector<std::pair<std::string, float>> compareDeepNetworkEmbedding(
     std::vector<std::pair<std::string, std::vector<float>>> resNetCsv, std::string targetImagePath, std::string buffer)
 {
@@ -251,7 +277,7 @@ std::vector<std::pair<std::string, float>> compareDeepNetworkEmbedding(
 std::vector<std::pair<std::string, float>> compareHistograms(struct dirent *dp, char *dirPath, char *targetImagePath,
                                                              cv::Mat targetHist, char *buffer, int histType)
 {
-    printf("\nProcessing images in directory ...\n");
+    printf("\nProcessing images in directory ...");
     std::vector<std::pair<std::string, float>> imageMatches;
 
     DIR *dirp = opendir(dirPath);
@@ -260,13 +286,20 @@ std::vector<std::pair<std::string, float>> compareHistograms(struct dirent *dp, 
         printf("Cannot open directory %s\n", "./sample_images");
         exit(-1);
     }
+    int count = 0;
 
+    // printf("Reading directory ...\n");
     while ((dp = readdir(dirp)) != NULL)
     {
         if (strstr(dp->d_name, ".jpg") || strstr(dp->d_name, ".png") || strstr(dp->d_name, ".ppm") ||
             strstr(dp->d_name, ".tif"))
         {
-            printf("Processing: %s\n", dp->d_name);
+            // printf(".", dp->d_name);
+            if (count % 10 == 0)
+            {
+                printf(".");
+            }
+            count++;
             strcpy(buffer, dirPath);
             strcat(buffer, "/");
             strcat(buffer, dp->d_name);
@@ -319,6 +352,7 @@ std::vector<std::pair<std::string, float>> compareHistograms(struct dirent *dp, 
         }
     }
 
+    printf("Processed %d images\n", count);
     printf("Closing directory ...\n");
     closedir(dirp);
     return imageMatches;
